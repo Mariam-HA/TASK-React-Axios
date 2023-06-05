@@ -4,14 +4,17 @@ import Navbar from "./components/Navbar";
 import PetDetail from "./components/PetDetail";
 import PetItem from "./components/PetItem";
 import PetList from "./components/PetList";
+import { Routes, Route } from "react-router-dom";
 
 function App() {
   return (
     <div className="font-mono">
       <Navbar />
-      <Home />
-      <PetList />
-      <PetDetail />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/pets" element={<PetList />} />
+        <Route path="/pets/:petId" element={<PetDetail />} />
+      </Routes>
     </div>
   );
 }
