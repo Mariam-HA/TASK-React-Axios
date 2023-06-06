@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { addPet } from "../api/pets";
 import Input from "./Input";
 
 const Modal = ({ show, setShowModal }) => {
@@ -6,6 +7,11 @@ const Modal = ({ show, setShowModal }) => {
   const [type, setType] = useState("");
   const [image, setImage] = useState("");
   const [available, setAvailable] = useState(0);
+
+  const handleSubmit = () => {
+    addPet(name, image, type, available);
+  };
+
   if (!show) return "";
   return (
     <div
@@ -47,7 +53,10 @@ const Modal = ({ show, setShowModal }) => {
           }}
         />
 
-        <button className="w-[70px] border border-black rounded-md ml-auto mr-5 hover:bg-green-400">
+        <button
+          onClick={handleSubmit}
+          className="w-[70px] border border-black rounded-md ml-auto mr-5 hover:bg-green-400"
+        >
           Submit
         </button>
       </div>
