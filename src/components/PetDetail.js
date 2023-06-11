@@ -1,28 +1,41 @@
-import React, { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+
 import { useParams } from "react-router-dom";
 import { deletePetByid, getPetByid, updatePet } from "../api/pets";
 
 const PetDetail = () => {
-  // const pet = petsData[0];
+  const queryClient = useQueryClient();
   const { petId } = useParams();
-  const [pet, setPet] = useState({});
 
-  const callApi = async () => {
-    const res = await getPetByid(petId);
-    setPet(res);
-  };
+  const { data: pet } = useQuery({
+    queryKey: ["pet", petId],
+    queryFn: () => getPetByid(petId),
+  });
 
-  // const pet = petsData.find((pett) => pett.id == petId);
-  const handleUpdate = () => {
-    updatePet(pet.id, pet.name, pet.image, pet.type, pet.adopted);
-  };
+  const { mutate: deleteThePet, isLoading } = useMutation({
+    mutationFn: () => deletePetByid(petId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pet"] });
+    },
+  });
+
+  const { mutate: updateThePet } = useMutation({
+    mutationFn: () => updatePet(petId, pet.name, pet.image, pet.type),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pet"] });
+    },
+  });
+
   const handleDelete = () => {
-    deletePetByid(pet.id);
+    deleteThePet();
   };
 
-  useEffect(() => {
-    callApi();
-  }, []);
+  const handleUpdate = () => {
+    updateThePet();
+  };
+
+  if (isLoading) return <h1> Loading..</h1>;
 
   if (!pet) {
     return <h1>There is no pet with the id: ${petId}</h1>;
@@ -63,3 +76,21 @@ const PetDetail = () => {
 };
 
 export default PetDetail;
+
+// const callApi = async () => {
+//   const res = await getPetByid(petId);
+//   setPet(res);
+// };
+
+// // const pet = petsData.find((pett) => pett.id == petId);
+// const handleUpdate = () => {
+//   updatePet(pet.id, pet.name, pet.image, pet.type, pet.adopted);
+// };
+
+// const handleDelete = () => {
+//   deletePetByid(pet.id);
+// };
+
+// useEffect(() => {
+//   callApi();
+// }, []);

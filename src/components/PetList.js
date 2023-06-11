@@ -2,24 +2,30 @@ import React, { useEffect, useState, useSyncExternalStore } from "react";
 import PetItem from "./PetItem";
 import Modal from "./Modal";
 import { getPets } from "../api/pets";
+import { useQuery } from "@tanstack/react-query";
 
 const PetList = () => {
   const [query, setQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [pets, setPets] = useState([]);
 
-  const callApi = async () => {
-    const res = await getPets();
-    setPets(res.data);
-  };
+  const {
+    data: pets,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["pets"],
+    queryFn: () => getPets(),
+  });
 
-  useEffect(() => {
-    callApi();
-  }, []);
-
+  // console.log(pets);
   const petList = pets
-    .filter((pet) => pet.name.toLowerCase().includes(query.toLowerCase()))
+    ?.filter((pet) => pet.name.toLowerCase().includes(query.toLowerCase()))
     .map((pet) => <PetItem pet={pet} key={pet.id} />);
+
+  if (isLoading) {
+    return <h1>Loading ...</h1>;
+  }
+
   return (
     <>
       <div className="bg-[#F9E3BE] flex flex-col justify-center items-center ">
@@ -50,3 +56,12 @@ const PetList = () => {
 };
 
 export default PetList;
+
+// const [pets, setPets] = useState([]);
+// const callApi = async () => {
+//   const res = await getPets();
+//   setPets(res.data);
+// };
+// useEffect(() => {
+//   callApi();
+// }, []);
